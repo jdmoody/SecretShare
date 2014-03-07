@@ -11,7 +11,7 @@ class SecretsController < ApplicationController
     if @secret.save
       redirect_to user_url(@user)
     else
-      flash[:errors] = @secret.errors.full_messages
+      flash.now[:errors] = @secret.errors.full_messages
       render :new
     end
   end

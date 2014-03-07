@@ -1,0 +1,19 @@
+<h1>All Users</h1>
+
+<ul>
+<% @users.each do |user| %>
+  <li>
+    <%= user.username %>
+    <% if Friendship.can_friend(current_user, user) %>
+      <%#= render 'friendships/form', user: user %>
+      <button class="friend" data-user="<%= user.id %>">Friend Me!</button>
+    <% end %>
+  </li>
+<% end %>
+</ul>
+
+<script>
+$('ul').on('click', '.friend', function(event) {
+  console.log(event.currentTarget.dataset.user);
+});
+</script>
