@@ -13,7 +13,22 @@
 </ul>
 
 <script>
-$('ul').on('click', '.friend', function(event) {
-  console.log(event.currentTarget.dataset.user);
-});
+  var removeFriendButton = function (model) {
+    $('[data-user="'+model.in_friend_id+'"]').remove();
+  };
+
+  $('ul').on('click', '.friend', function(event) {
+    console.log(event.currentTarget);
+    $(event.currentTarget).html("Friending...");
+    $(event.currentTarget).attr('disabled', 'true');
+
+    var $friend_id = (event.currentTarget.dataset.user);
+    $.ajax({
+      url: "/users/" + $friend_id + "/friendships",
+      type: 'POST',
+      success: function(model) {
+        removeFriendButton(model);
+      }
+    });
+  });
 </script>
