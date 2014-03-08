@@ -4,31 +4,52 @@
 <% @users.each do |user| %>
   <li>
     <%= user.username %>
+
     <% if Friendship.can_friend(current_user, user) %>
-      <%#= render 'friendships/form', user: user %>
-      <button class="friend" data-user="<%= user.id %>">Friend Me!</button>
+      <% friendship_status = "can-friend" %>
+    <% elsif Friendship.can_unfriend(current_user, user) %>
+      <% friendship_status = "can-defriend" %>
+    <% else %>
+      <% friendship_status = "self" %>
     <% end %>
+
+    <div data-user="<%= user.id %>" class="friend-buttons <%= friendship_status %>">
+      <button class="friend">Friend Me!</button>
+      <button class="defriend">
+        Destroy Friendship!</button>
+    </div>
   </li>
 <% end %>
 </ul>
 
 <script>
-  var removeFriendButton = function (model) {
-    $('[data-user="'+model.in_friend_id+'"]').remove();
-  };
+
+  var toggleFriendButtons = function(event) {
+    $(event.currentTarget.parentElement).toggleClass('can-friend can-defriend');
+  }
 
   $('ul').on('click', '.friend', function(event) {
-    console.log(event.currentTarget);
-    $(event.currentTarget).html("Friending...");
-    $(event.currentTarget).attr('disabled', 'true');
 
-    var $friend_id = (event.currentTarget.dataset.user);
+    var $friend_id = (event.currentTarget.parentElement.dataset.user);
     $.ajax({
-      url: "/users/" + $friend_id + "/friendships",
+      url: "/users/" + $friend_id + "/friendship",
       type: 'POST',
-      success: function(model) {
-        removeFriendButton(model);
+      success: function() {
+        toggleFriendButtons(event);
       }
     });
   });
+
+  $('ul').on('click', '.defriend', function(event) {
+    console.log(event);
+
+    var $friend_id = (event.currentTarget.parentElement.dataset.user);
+    $.ajax({
+      url: "/users/" + $friend_id + "/friendship",
+      type: 'DELETE',
+      success: function() {
+        toggleFriendButtons(event);
+      }
+    });
+  })
 </script>

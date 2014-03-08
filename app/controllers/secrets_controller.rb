@@ -5,11 +5,12 @@ class SecretsController < ApplicationController
 
   def create
     @user = User.find(params[:secret][:recipient_id])
-    @secret = @user.received_secrets.new(secret_params)
+    @secret = Secret.new(secret_params)
     @secret.author_id = current_user.id
+    # @secret.tag_ids
 
     if @secret.save
-      redirect_to user_url(@user)
+      render :json => @secret
     else
       flash.now[:errors] = @secret.errors.full_messages
       render :new
@@ -18,6 +19,10 @@ class SecretsController < ApplicationController
 
   private
   def secret_params
-    params.require(:secret).permit(:title)
+    params.require(:secret).permit(:title, :recipient_id, tag_ids: [])
+  end
+
+  def tag_params
+    # params.permit(tags:
   end
 end
